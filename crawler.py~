@@ -1,0 +1,13 @@
+from pattern.web import Crawler, DEPTH, BREADTH
+
+class vtqCrawler(Crawler): 
+     def visit(self, link, source=None):
+	print 'visited:', repr(link.url), 'from:', link.referrer
+     def fail(self, link):
+        print 'failed:', repr(link.url)
+
+
+fileIO = open("dataset.csv", "wb")
+p = vtqCrawler(links=['http://www.dantri.com.vn/'], delay=3)
+while not p.done:
+	p.crawl(method=BREADTH, cached=False, throttle=3)
