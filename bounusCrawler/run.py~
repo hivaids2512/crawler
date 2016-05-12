@@ -1,0 +1,5 @@
+from vtquCrawler import vtquCrawler
+if __name__ == '__main__':
+	try:
+		crawler = vtquCrawler()
+		crawler.start()
