@@ -30,21 +30,25 @@ class vtquCrawler():
 				links.append("https://vozforums.com/"+a['href'])
 		return links
 
+	def getDate(self, soup):
+		dates = soup.find_all("div", class_="normal")
+		return dates[1].text.encode("utf-8").strip()
+
+	def getMessages(self, soup):
+		messages = soup.find_all("div", class_="voz-post-message")
+		mess =""		
+		for message in messages:
+			mess = mess.strip() + "." + str(message.text).strip().replace("\n", "").replace("\t", "").encode("utf-8")
+		return mess
+
 	def processSoup(self, soup, link):
-		if(soup.title.string.lower().find("tư vấn")!=-1):
-			resultSet = soup.body.findAll(text=re.compile('(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[012])-((19|20))'))
-			date = "?"
-			dates = []
-			for result in resultSet:
-				dates.append(str(result))
-			if(len(resultSet)>2):
-				date = dates[1].strip()
-			messages = soup.find_all("div", class_="voz-post-message")
-			mess =""		
-			for message in messages:
-				mess = mess.strip() + "." + str(message.text).strip().replace("\n", "").replace("\t", "").encode("utf-8")		
+		if(soup.title.string.lower().find("tư vấn")!=-1 or soup.title.string.lower().find("cấu hình")!=-1):
+			date = self.getDate(soup)
+			mess = self.getMessages(soup)
 			print 'importing data'
-			self.writeFile(link+","+soup.title.string.encode("utf-8")+","+mess+","+date+"\n")
+			self.writeFile(link+";"+soup.title.string.encode("utf-8")+";"+mess+";"+date+"\n")
+		else:
+			print 'no data to import'
 
 	def start(self):
 		for link in self.crawllist:
