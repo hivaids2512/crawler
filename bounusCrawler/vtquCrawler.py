@@ -13,6 +13,9 @@ class vtquCrawler():
 	timewait = 2;
 	crawllist = []
 
+	def p(self, string):
+		return " ".join(string.split())
+
 	def __init__(self):
 		for i in range(1, 1472):
 			self.crawllist.append('https://vozforums.com/forumdisplay.php?f=24&order=desc&page='+str(i))
@@ -38,7 +41,7 @@ class vtquCrawler():
 		messages = soup.find_all("div", class_="voz-post-message")
 		mess =""		
 		for message in messages:
-			mess = mess.strip() + "." + str(message.text).strip().replace("\n", "").replace("\t", "").encode("utf-8")
+			mess = mess.strip() + "." + self.p(str(message.text)).encode("utf-8")
 		return mess
 
 	def processSoup(self, soup, link):
@@ -52,6 +55,7 @@ class vtquCrawler():
 
 	def start(self):
 		for link in self.crawllist:
+			print 'Start to crawl: ' + link 
 			response = urllib2.urlopen(link)	
 			html = response.read()
 			links = self.findLinks(html)
@@ -62,5 +66,6 @@ class vtquCrawler():
 				threadContent = thread.read()
 				soup = BeautifulSoup(threadContent)
 				self.processSoup(soup, a)
+		print 'done!'
 
 
