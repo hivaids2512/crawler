@@ -1,0 +1,20 @@
+from vtqCrawler import vtqCrawler
+from bs4 import BeautifulSoup, SoupStrainer
+import codecs
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+import urllib2
+import time
+import re
+import json
+
+link = 'http://pcpartpicker.com/parts/cpu/fetch/'
+response = urllib2.urlopen(link)
+
+json = response.read()
+print json
+parsed_json = json.loads(json)
+print(parsed_json['data'])
+
+

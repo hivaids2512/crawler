@@ -1,0 +1,60 @@
+# -*- coding: utf-8 -*-
+from bs4 import BeautifulSoup, SoupStrainer
+import codecs
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+import urllib2
+import time
+import re
+
+class vtqCrawler():
+	
+	timewait = 2;
+	crawllist = []
+
+	def __init__(self, links):
+		crawllist = links
+
+	def writeFile(self, content):
+     		fileIO = codecs.open("dataset.csv", "a", encoding="utf-8")
+		fileIO.write(content)
+		fileIO.close()
+
+	def findLinks(self, response):
+		soup = BeautifulSoup(response)
+		links = []
+		for a in soup.find_all('a', href=True):
+			if(str(a['href']).find("/part/")!=-1):
+				links.append("http://pcpartpicker.com"+a['href'])
+		return links
+
+	def getSpecs(self, soup):
+		specs_block = soup.find_all("div", class_="specs block")
+		specs =""		
+		for spec in specs:
+			specs = specs.strip() + "," + str(spec.text)
+		return specs
+
+	def processSoup(self, soup, link):
+		specs = self.getSpecs(soup)
+		print 'importing data'
+		self.writeFile(specs)
+
+	def crawl(self):
+		print len(self.crawllist)
+		for link in self.crawllist:
+			print 'Start to crawl: ' + link 
+			response = urllib2.urlopen(link)	
+			html = response.read()
+			links = self.findLinks(html)
+			for a in links:
+				time.sleep(self.timewait)
+				print 'opening link:' + str(a)
+				part = urllib2.urlopen(a)	
+				partContent = part.read()
+				soup = BeautifulSoup(partContent)
+				self.processSoup(soup, a)
+		print 'done!'
+
+
